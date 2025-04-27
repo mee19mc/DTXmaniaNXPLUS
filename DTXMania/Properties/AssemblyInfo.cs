@@ -3,15 +3,12 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Resources;
 
-// アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
-// アセンブリに関連付けられている情報を変更するには、
-// これらの属性値を変更してください。
-[assembly: AssemblyTitle("DTXManiaNX")]
+[assembly: AssemblyTitle("GITADORA")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DTXManiaNX")]
-[assembly: AssemblyCopyright( "Copyright (C) 2000-2024 DTXMania Group / Modified by fisyher" )]
+[assembly: AssemblyProduct("GITADORA")]
+[assembly: AssemblyCopyright( "Copyright (C) 2000-2024 DTXMania Group / Modified for M32" )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
