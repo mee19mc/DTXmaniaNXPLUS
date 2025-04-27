@@ -21,6 +21,7 @@ namespace DTXMania
 			base.listChildActivities.Add( this.actFIfromSetup = new CActFIFOWhite() );
 			base.listChildActivities.Add( this.actFI = new CActFIFOWhite() );
 			base.listChildActivities.Add( this.actFO = new CActFIFOWhite() );
+ 			base.listChildActivities.Add(this.actBackgroundVideoAVI = new CActSelectBackgroundAVI());
 		}
 
 
@@ -68,20 +69,69 @@ namespace DTXMania
 			}
 			base.OnDeactivate();
 		}
+ 		public override void OnDeactivate()
+		{
+			Trace.TraceInformation( "選曲ステージを非活性化します。" );
+			Trace.Indent();
+			try
+			{
+				if (this.rBackgroundVideoAVI != null)
+				{
+					this.rBackgroundVideoAVI.Dispose();
+					this.rBackgroundVideoAVI = null;
+				}
+
+				if ( this.ftFont != null )
+				{
+					this.ftFont.Dispose();
+					this.ftFont = null;
+				}
+
+				if(this.ftSearchInputNotificationFont != null)
+                {
+					this.ftSearchInputNotificationFont.Dispose();
+					this.ftSearchInputNotificationFont = null;
+                }
+
+				for( int i = 0; i < 4; i++ )
+				{
+					this.ctKeyRepeat[ i ] = null;
+				}
+				base.OnDeactivate();
+			}
+			finally
+			{
+				Trace.TraceInformation( "選曲ステージの非活性化を完了しました。" );
+				Trace.Unindent();
+			}
+		}
 		public override void OnManagedCreateResources()
 		{
 			if( !base.bNotActivated )
 			{
 				this.tx背景 = CDTXMania.tGenerateTexture( CSkin.Path( @"Graphics\2_background.jpg" ), false );
 				this.txメニュー = CDTXMania.tGenerateTexture( CSkin.Path( @"Graphics\2_menu.png" ), false );
-				base.OnManagedCreateResources();
+    
+				//
+				this.rBackgroundVideoAVI = new CDTX.CAVI(1290, CSkin.Path(@"Graphics\5_background.mp4"), "", 20.0);
+				this.rBackgroundVideoAVI.OnDeviceCreated();
+				if (rBackgroundVideoAVI.avi != null)
+				{					
+					this.actBackgroundVideoAVI.bLoop = true;
+					this.actBackgroundVideoAVI.Start(EChannel.MovieFull, rBackgroundVideoAVI, 0, -1);
+					Trace.TraceInformation("選曲ムービーを有効化しました。");
+				}
+
+    				base.OnManagedCreateResources();
+
 			}
 		}
 		public override void OnManagedReleaseResources()
 		{
 			if( !base.bNotActivated )
 			{
-				CDTXMania.tReleaseTexture( ref this.tx背景 );
+				actBackgroundVideoAVI.Stop();
+    				CDTXMania.tReleaseTexture( ref this.tx背景 );
 				CDTXMania.tReleaseTexture( ref this.txメニュー );
 				base.OnManagedReleaseResources();
 			}
@@ -111,8 +161,12 @@ namespace DTXMania
 				//---------------------
 				#endregion
 
-				// 進行
-
+				this.actBackgroundVideoAVI.tUpdateAndDraw();
+				if( this.txBackground != null && this.rBackgroundVideoAVI.avi == null)
+         		       {
+					this.txBackground.tDraw2D(CDTXMania.app.Device, 0, 0);
+					//Removed drawing upside down	
+				}
 				#region [ カーソル上移動 ]
 				//---------------------
 				if( this.ct上移動用.b進行中 )
@@ -334,6 +388,7 @@ namespace DTXMania
 		private CActFIFOWhite actFI;
 		private CActFIFOWhite actFIfromSetup;
 		private CActFIFOWhite actFO;
+ 		 private readonly CActSelectBackgroundAVI actBackgroundVideoAVI;
 		private CCounter ctカーソルフラッシュ用;
 		private STキー反復用カウンタ ctキー反復用;
 		private CCounter ct下移動用;
@@ -345,6 +400,9 @@ namespace DTXMania
 		private int n現在のカーソル行;
 		private CTexture txメニュー;
 		private CTexture tx背景;
+  		private CDTX.CAVI rBackgroundVideoAVI;// background Video using CAVI class
+    		private long lDshowPosition;
+		private long lStopPosition;
 	
 		private void tカーソルを下へ移動する()
 		{
